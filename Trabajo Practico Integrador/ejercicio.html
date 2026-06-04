@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ejercicio2</title>
+</head>
+<body>
+    <h1>Multiverso de Personajes</h1>
+
+    <input type="text" id="busqueda" placeholder="Buscar personaje">
+
+    <select id="fuente">
+        <option value="rm">Rick y Morty</option>
+        <option value="simpsons">Los Simpson</option>
+    </select>
+
+    <button id="buscar">Buscar</button>
+
+    <div id="resultados"></div>
+
+    <script>
+       const busqueda = document.getElementById("busqueda");
+    const fuente = document.getElementById("fuente");
+    const boton = document.getElementById("buscar");
+    const resultados = document.getElementById("resultados");
+
+boton.addEventListener("click", cargarPersonajes);
+
+async function cargarPersonajes() {
+    try {
+
+        let personajes = [];
+
+        if (fuente.value === "rm") {
+
+            let url = busqueda.value
+                ? `https://rickandmortyapi.com/api/character/?name=${busqueda.value}`
+                : "https://rickandmortyapi.com/api/character";
+
+            const resp = await fetch(url);
+
+            if (!resp.ok) {
+                throw new Error("No encontrado");
+            }
+
+            const data = await resp.json();
+
+            personajes = data.results.map(p => ({
+                nombre: p.name,
+                imagen: p.image,
+                estado: p.status
+            }));
+
+        } else {
+
+            const resp = await fetch('https://thesimpsonsapi.com/api/characters/1');
+            console.log(resp);
+
+            if (!resp.ok) {
+                throw new Error("Error");
+            }
+
+            const data = await resp.json();
+
+            personajes = data.map(p => ({
+                nombre: p.name,
+                imagen: p.image,
+                estado: p.status
+            }));
+        }
+
+        mostrar(personajes);
+
+    } catch (error) {
+        resultados.innerHTML = "<h2>Error al cargar personajes</h2>";
+    }
+}
+
+function mostrar(personajes) {
+
+    resultados.innerHTML = "";
+
+    personajes.forEach(p => {
+        resultados.innerHTML += `
+            <div>
+                <img src="${p.imagen}" width="100">
+                <h3>${p.nombre}</h3>
+                <p>${p.estado}</p>
+            </div>
+            <hr>
+        `;
+    });
+} 
+    </script>
+</body>
+</html>
